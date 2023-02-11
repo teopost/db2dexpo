@@ -130,3 +130,6 @@ db2_lockwaits_maxwait_seconds{db2instance="db2inst1",dbhost="127.0.0.1",dbname="
 # TYPE db2_employees_created gauge
 db2_employees_created{db2instance="db2inst1",dbhost="127.0.0.1",dbname="sample",dbport="50000",dbenv="test",persontype="employee"} 1442.0
 ```
+
+# References
+* https://itnext.io/creating-a-db2-client-container-as-prometheus-scraping-target-in-k8s-b36e5cdbd394
