@@ -57,8 +57,8 @@ class CustomExporter:
             exporter_port = int(os.environ.get("DB2DEXPO_PORT", "9877"))
             start_http_server(exporter_port)
             logger.info(
-                "Db2DExpo server started at port {}".format(exporter_port))
+                "Server started at port {}".format(exporter_port))
         except Exception as e:
             logger.fatal(
-                "Failed to start Db2DExpo server at port {}".format(exporter_port))
+                "Failed to start server at port {}".format(exporter_port))
             raise e

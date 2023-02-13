@@ -129,4 +129,8 @@ db2_lockwaits_maxwait_seconds{db2instance="db2inst1",dbhost="127.0.0.1",dbname="
 # HELP db2_employees_created Number of employees
 # TYPE db2_employees_created gauge
 db2_employees_created{db2instance="db2inst1",dbhost="127.0.0.1",dbname="sample",dbport="50000",dbenv="test",persontype="employee"} 1442.0
+
 ```
+
+# References
+* https://tomgregory.com/the-four-types-of-prometheus-metrics/

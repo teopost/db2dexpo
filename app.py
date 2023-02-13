@@ -1,7 +1,7 @@
 import os
 import sys
-from db2dexpo.db2 import Db2Connection
-from db2dexpo.prometheus import CustomExporter, INVALID_LABEL_STR
+from db2prometheus.db2 import Db2Connection
+from db2prometheus.prometheus import CustomExporter, INVALID_LABEL_STR
 import yaml
 import logging
 from dotenv import load_dotenv
@@ -12,17 +12,12 @@ import re
 def db2_instance_connections(config_connections: list):
     db2_connections = {}
     for c in config_connections:
-        db_user_var = c.get("db_user_var") if c.get(
-            "db_user_var") else "DB2DEXPO_USER"
-        db_passwd_var = c.get(
-            "db_passwd_var") if c.get("db_passwd_var") else "DB2DEXPO_PASSWD"
-
         conn = {
             "db_name": c.get("db_name"),
             "db_hostname": c.get("db_host"),
             "db_port": c.get("db_port"),
-            "db_user": os.environ.get(db_user_var),
-            "db_passwd": os.environ.get(db_passwd_var)
+            "db_user": c.get("db_user"),
+            "db_passwd": c.get("db_password")
         }
 
         if not conn["db_name"]:
@@ -41,11 +36,11 @@ def db2_instance_connections(config_connections: list):
             sys.exit(1)
 
         if not conn["db_user"]:
-            logging.fatal("Shell variable {} not set.".format(db_user_var))
+            logging.fatal("Missing db_user field for connections. Check the connections YAML file.")
             sys.exit(1)
 
         if not conn["db_passwd"]:
-            logging.fatal("Shell variable {} not set.".format(db_passwd_var))
+            logging.fatal("Missing db_password field for connections. Check the connections YAML file.")
             sys.exit(1)
 
         conn_hash = "{}:{}/{}".format(c["db_host"], c["db_port"], c["db_name"])
@@ -256,8 +251,7 @@ if __name__ == '__main__':
             logging.fatal("Could not load .env file")
             raise e
 
-        log_level = logging.getLevelName(
-            os.environ.get("DB2DEXPO_LOG_LEVEL", logging.INFO))
+        log_level = logging.getLevelName(os.environ.get("DB2DEXPO_LOG_LEVEL", logging.INFO))
         log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=log_level, format=log_format)
 
@@ -275,10 +269,9 @@ if __name__ == '__main__':
             sys.exit(2)
 
         # Load YAML files
-        connections_file = os.environ.get(
-            "DB2DEXPO_CONNECTIONS_FILE", "config.yaml")
-        queries_file = os.environ.get(
-            "DB2DEXPO_QUERIES_FILE", "config.yaml")
+        connections_file = os.environ.get("DB2DEXPO_CONNECTIONS_FILE", "config-connections.yaml")
+        queries_file = os.environ.get("DB2DEXPO_QUERIES_FILE", "config-queries.yaml")
+
         config_connections = load_config_yaml(connections_file, "connections")
         config_queries = load_config_yaml(queries_file, "queries")
 
@@ -302,5 +295,5 @@ if __name__ == '__main__':
         asyncio.run(main(**main_params))
 
     except KeyboardInterrupt:
-        logging.warning("Db2DExpo stopped")
+        logging.warning("db2-prometheus-exporter stopped")
         sys.exit(5)
